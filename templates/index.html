@@ -22,11 +22,11 @@
                 <h1 class="display-5 text-center">Intro to Computer Networks - Course Project</h1>
             </div>
             <div class="row pb-3">
-                <div class="col-6">
+                <div class="col-12 col-lg-6 mb-3 mb-lg-0">
                     <div class="card h-100">
                         <div class="card-body">
                             <h5 class="card-title">Yahtzee Client</h5>
-                            <textarea class="form-control mono mb-2" id="client_output" rows="19" readonly></textarea>
+                            <textarea class="form-control mono mb-2" id="client_output" rows="15" readonly></textarea>
                             <div class="input-group">
                                 <input id="command" type="text" class="form-control" placeholder="Enter Command">
                                 <button class="input-group-text" onclick="sendCommand()">Send</button>
@@ -35,11 +35,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-6">
+                <div class="col-12 col-lg-6">
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Yahtzee Server</h5>
-                            <textarea class="form-control mono" id="server_output" rows="21" readonly></textarea>
+                            <textarea class="form-control mono" id="server_output" rows="17" readonly></textarea>
                         </div>            
                     </div>
                 </div>
@@ -49,8 +49,8 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Packet Capture</h5>
-                            <input type="text" class="form-control mono border-0" id="header" rows="1" value="| No. | Time     | Source          | Destination     | Protocol | Length | Ports           | Info                                     | Raw Data" readonly></input>
-                            <textarea class="form-control mono" id="wire_output" rows="9" readonly></textarea>
+                            <input type="text" class="form-control mono border-0" id="header" rows="1" value="| No. | Time     | Source          | Destination     | Protocol | Length | Ports           | Info                                        | Raw Data" readonly></input>
+                            <textarea wrap="off" class="form-control mono" id="wire_output" rows="9" readonly></textarea>
                         </div>            
                         </div>            
                     </div>
@@ -59,6 +59,12 @@
         </div>
         <script>
             const socket = io();
+            let port = 0;
+            
+            // Collect the port for packet filtering
+            socket.on('connection', function(msg) {
+                port = msg.port
+            });
 
             // Handle normal server messages (TCP responses)
             socket.on('client_log', function(msg) {
@@ -76,9 +82,12 @@
 
             // Handle internal server logs
             socket.on('wire_log', function(msg) {
+                console.log("Wire log msg:", msg);
                 const wireOutput = document.getElementById('wire_output');
-                wireOutput.value += msg.data + '\n';
-                wireOutput.scrollTop = wireOutput.scrollHeight;
+                if (parseInt(msg.port) === port) {
+                    wireOutput.value += msg.data + '\n';
+                    wireOutput.scrollTop = wireOutput.scrollHeight;
+                }
             });
 
             function sendCommand() {
@@ -87,7 +96,8 @@
                 socket.emit('send_command', { data: message });
                 input.value = '';
             }
-
+            
+            // Map enter key to trigger send command
             document.getElementById('command').addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();
