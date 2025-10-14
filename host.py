@@ -71,7 +71,7 @@ def packet_capture(queue):
             port = int(packet.tcp.srcport)
             if port == 8888:
                 port = int(packet.tcp.dstport)
-            trace = f'| {str(packet.number).ljust(3)} | {str(int(now*10000)/10000).ljust(8)} | {packet.ip.src.ljust(15)} | {packet.ip.dst.ljust(15)} | {prot.ljust(8)} | {str(packet.length).ljust(6)} | {ports.ljust(15)} | {info_str.ljust(43)} | {raw_hex}'
+            trace = f'| {str(packet.number).ljust(3)} | {str(int(now*10000)/10000).ljust(12)} | {packet.ip.src.ljust(13)} | {packet.ip.dst.ljust(13)} | {prot.ljust(8)} | {str(packet.length).ljust(6)} | {ports.ljust(15)} | {info_str.ljust(43)} | {raw_hex}'
             queue.put([trace, port])
             
     except KeyboardInterrupt:
@@ -99,27 +99,29 @@ def handle_client(client_socket, client_address, queue, sid):
             if command in ("help", "?"):
                 response = (
                     "Commands:\n"
+                    "  roll            Roll all dice\n"
                     "  roll [1-5]...   Roll dice (optionally specify dice to reroll i.e roll 1 2 4)\n"
                     "  score ?         Show available score categories\n"
                     "  score [n]       Score the current dice in category number n\n"
                     "  new             Start a new game\n"
                 )
                 
-            if command == "roll":
-                if args == []:
-                    response = str(game.next_roll())
+            elif command == "roll":
                 try:
-                    indices = [int(i) - 1 for i in args]
-                    if all(0 <= i <= 4 for i in indices):
-                        reroll = [i in indices for i in range(5)]
-                        game.set_reroll(reroll)
+                    if not args:
                         response = str(game.next_roll())
                     else:
-                        response = "Invalid Input: Dice must be between 0 and 4\n"
+                        indices = [int(i) - 1 for i in args]
+                        if all(0 <= i <= 4 for i in indices):
+                            reroll = [i in indices for i in range(5)]
+                            game.set_reroll(reroll)
+                            response = str(game.next_roll())
+                        else:
+                            response = "Invalid Input: Dice must be between 1 and 5\n"
                 except ValueError:
                     response = "Invalid Input: Dice must be numbers\n"
 
-            if command == "score":
+            elif command == "score":
                 if args and args[0] == '?':
                     response = game.get_available_scores()
                 elif args:
@@ -135,10 +137,13 @@ def handle_client(client_socket, client_address, queue, sid):
                 else:
                     response = "Invalid Input: No argument specified\n"
 
-            if command == "new":
+            elif command == "new":
                 game.new_game()
                 response = "Welcome to Yahtzee!\n"
-
+            
+            else:
+                response = "Unknown command. Type 'help' for available commands.\n"
+                
             client_socket.sendall(response.encode('utf-8') + b'\n')
     
     except Exception as e:

@@ -14,7 +14,7 @@ class yahtzee:
 
     def roll(self):
         for i in range(5):
-            if self.reroll[i] is True:
+            if self.roll_count == 3 or self.reroll[i] is True:
                 self.dice[i] = randint(1, 6)
 
     def set_reroll(self, reroll):
