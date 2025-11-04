@@ -38,7 +38,6 @@ def packet_capture(queue):
             now = time.time() - start_time # Option date stamp, I prefer time in seconds. {str(packet.sniff_time).ljust(8)}
             prot = "TCP" # packet.ip.proto gives int, we know its TCP so overriding it
             ports = f'{packet.tcp.srcport} → {packet.tcp.dstport}'
-
             tcp = packet.tcp
 
             flags = []
@@ -123,7 +122,7 @@ def handle_client(client_socket, client_address, queue, sid):
 
             elif command == "score":
                 if args and args[0] == '?':
-                    response = game.get_available_scores()
+                    response = game.get_scoreboard()
                 elif args:
                     try:
                         choice = int(args[0])
@@ -185,7 +184,8 @@ def tcp_client_thread(sid):
         sock.sendall(msg.encode('utf-8'))
         client_sockets[sid] = sock
 
-        socketio.emit('connection', {'port': sock.getsockname()[1]}, room=sid) # Send port to webpage for packet filtering
+        # Send port to webpage for packet filtering
+        socketio.emit('connection', {'port': sock.getsockname()[1]}, room=sid) 
 
         while True:
             data = sock.recv(4096).decode('utf-8')
@@ -256,7 +256,6 @@ if __name__ == '__main__':
 
     # Start the TCP server log emitter
     socketio.start_background_task(emit_server_logs)
-
     
     # Start packet capture thread
     start_thread(packet_capture, wire_queue)

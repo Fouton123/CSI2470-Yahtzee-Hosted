@@ -21,14 +21,15 @@ class yahtzee:
         self.reroll = reroll
 
     def next_roll(self):
-        if self.roll_count > 0:
-            self.roll_count -= 1
-            self.roll()
+        if self.roll_count <= 0:
+            return "No rolls left! Score your dice to begin the next turn."
 
+        self.roll()
+        self.roll_count -= 1
         return f'Dice: {self.dice}, Rolls Left: {self.roll_count}'
 
     def reset_roll(self):
-        self.roll_count = 4
+        self.roll_count = 3  
         self.reroll = [True] * 5
 
     def get_counts(self): 
@@ -80,6 +81,16 @@ class yahtzee:
 
         return options
     
+    def get_scoreboard(self):
+        options = f'| {"Num".ljust(3)} | {"Name".ljust(15)} | {"Pts".rjust(3)} |\n'
+        for i, label in enumerate(LABELS[:13]):  # exclude Yahtzee bonus for simplicity
+            if self.available[i] == 0:
+                pts = str(self.scores[i])
+            else:
+                pts = ""
+            options += f'| {str(i+1).ljust(3)} | {label.ljust(15)} | {pts.rjust(3)} |\n'
+        return options
+
     def score_dice(self, index):
         if self.available[index] == 0:
             return
@@ -126,6 +137,7 @@ class yahtzee:
             return self.get_final_score()        
         else:
             self.reset_roll()
+            self.dice = [0, 0, 0, 0, 0]
             return self.get_current_score()
         
     def is_yahtzee(self):
