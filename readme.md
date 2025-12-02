@@ -1,7 +1,7 @@
 # Installation & Setup Guide
 ## Live Demo (No Installation Required)
 If you prefer not to install and run the project locally, you can try the hosted version at:
-[erickausch.con](https://erickausch.com)
+[erickausch.con](http://erickausch.com)
 
 This demo allows you to experience the program’s features directly in your browser without setting up any dependencies.
 
