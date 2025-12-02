@@ -91,6 +91,7 @@ def handle_client(client_socket, client_address, queue, sid):
                 break
             msg = data.decode('utf-8').strip().lower().split()
             queue.put([f'Received from client: {msg}', sid])
+            queue.put([f'Sending response to client for command: {msg}', sid])
             command = msg[0]
             args = msg[1:]
             response = ""

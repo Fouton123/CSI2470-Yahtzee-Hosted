@@ -31,6 +31,7 @@ class yahtzee:
     def reset_roll(self):
         self.roll_count = 3  
         self.reroll = [True] * 5
+        self.dice = [0] * 5
 
     def get_counts(self): 
         self.counts = [0] * 6
@@ -137,7 +138,6 @@ class yahtzee:
             return self.get_final_score()        
         else:
             self.reset_roll()
-            self.dice = [0, 0, 0, 0, 0]
             return self.get_current_score()
         
     def is_yahtzee(self):
@@ -154,7 +154,7 @@ class yahtzee:
 
     def is_full_house(self):
         self.get_counts()
-        return sorted(self.counts)[-2:] == [2, 3]
+        return 3 in self.counts and 2 in self.counts
 
     def is_small_straight(self):
         unique = sorted(set(self.dice))
