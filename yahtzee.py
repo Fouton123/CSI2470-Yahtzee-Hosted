@@ -55,7 +55,7 @@ class yahtzee:
             options += f'| {str(count+1).ljust(3)} | {LABELS[count].ljust(15)} | {str(self.scores[count]).rjust(3)} |\n'
 
         options += f'| {"Total Lower Score".rjust(21)} | {str(lower).rjust(3)} |\n'
-        options += f'| {"Total Upper Score".rjust(21)} | {str(upper).rjust(3)} |\n'
+        options += f'| {"Total Upper Score".rjust(21)} | {str(upper+bonus).rjust(3)} |\n'
         options += f'| {"GRAND TOTAL".rjust(21)} | {str(lower+upper+bonus).rjust(3)} |\n'
         
         return options
